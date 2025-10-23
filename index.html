@@ -117,20 +117,16 @@
             const qrCodeSize = 300; // ขนาด QR Code (กว้าง x สูง)
             const logoSize = 80;    // ขนาดโลโก้
 
-            // ⬇️ ----------------- ข้อควรระวังเรื่องโลโก้ ----------------- ⬇️
-            // 
-            // 1. นี่คือลิงก์ที่คุณให้มา (มีโอกาสล้มเหลวสูงเพราะ CORS)
-            const logoURL = 'โลโก้วัดไชยามาตย์ Ver.3 1.png'; 
+            // ⬇️ --- การตั้งค่าโลโก้ (เลือก 1 แบบ) --- ⬇️
             
-            // 2. (แนะนำ) หากแบบที่ 1 ไม่ทำงาน ให้ใช้วิธีนี้:
-            //    - ดาวน์โหลดโลโก้ของคุณมา
-            //    - ตั้งชื่อไฟล์ว่า 'logo.png'
-            //    - อัปโหลดไฟล์ 'logo.png' นี้ไปที่ GitHub Repo เดียวกับ 'index.html'
-            //    - แล้วลบ // หน้าบรรทัดถัดไป (และใส่ // หน้าบรรทัด const logoURL = 'https://...' ด้านบนแทน)
-            //
+            // 1. แบบลิงก์ตรง (ที่คุณให้มา)
+            const logoURL = 'https://img2.pic.in.th/pic/-Ver.3-1.png'; 
+            
+            // 2. (แนะนำ) แบบอัปโหลดไฟล์ (ถ้าแบบ 1 ไม่ทำงานเพราะ CORS)
+            //    (ลบ // หน้าบรรทัดถัดไป และใส่ // หน้าบรรทัดด้านบน)
             // const logoURL = 'logo.png'; 
-            //
-            // ⬆️ ------------------------------------------------------------- ⬆️
+            
+            // ⬆️ ------------------------------------- ⬆️
 
 
             const textInput = document.getElementById('text-input');
@@ -138,7 +134,7 @@
             const qrContainer = document.getElementById('qrcode-container');
             const downloadBtn = document.getElementById('download-btn');
 
-            let qrcodeInstance = null; // ตัวแปรสำหรับเก็บ QR Code ที่สร้างแล้ว
+            let qrcodeInstance = null; 
 
             generateBtn.addEventListener('click', () => {
                 const text = textInput.value;
@@ -148,40 +144,37 @@
                     return;
                 }
 
-                // ล้าง QR Code เก่า (ถ้ามี)
                 qrContainer.innerHTML = '';
                 downloadBtn.style.display = 'none';
 
-                // ตั้งค่าตัวเลือกสำหรับ EasyQRCodeJS
                 const options = {
                     text: text,
                     width: qrCodeSize,
                     height: qrCodeSize,
                     colorDark: "#000000",
                     colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H, // "H" (High) จำเป็นสำหรับการใส่โลโก้
+                    
+                    // ✅✅✅ แก้ไขแล้ว: ใช้ EasyQRCodeJS.CorrectLevel.H ✅✅✅
+                    correctLevel: EasyQRCodeJS.CorrectLevel.H, 
                     
                     // การตั้งค่าโลโก้
                     logo: logoURL,
                     logoWidth: logoSize,
                     logoHeight: logoSize,
-                    logoBackgroundTransparent: true // ทำให้พื้นหลังโลโก้โปร่งใส (ถ้าโลโก้เป็น PNG)
+                    logoBackgroundTransparent: true 
                 };
 
-                // สร้าง QR Code
                 try {
                     qrcodeInstance = new EasyQRCodeJS(qrContainer, options);
-                    downloadBtn.style.display = 'inline-block'; // แสดงปุ่มดาวน์โหลด
+                    downloadBtn.style.display = 'inline-block';
                 } catch (error) {
                     console.error(error);
                     alert('เกิดข้อผิดพลาดในการสร้าง QR Code ตรวจสอบว่าไฟล์โลโก้ถูกต้องหรือไม่ (อาจเป็นปัญหา CORS)');
                 }
             });
 
-            // การทำงานของปุ่มดาวน์โหลด
             downloadBtn.addEventListener('click', () => {
                 if (qrcodeInstance) {
-                    // ใช้เมธอด .download() ของ library
                     qrcodeInstance.download('qrcode-with-logo'); 
                 }
             });
