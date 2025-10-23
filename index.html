@@ -10,14 +10,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- 
-      (สคริปต์ Library ยังคงอยู่ที่นี่)
-    -->
-    <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.5.0/dist/easy.qrcode.min.js"></script>
+    <!-- ✅✅✅ เปลี่ยน Library ใหม่! ✅✅✅ -->
+    <!-- ใช้ 'qr-code-styling' แทน 'easyqrcodejs' -->
+    <script src="https://unpkg.com/qr-code-styling@1.6.0/qr-code-styling.js" defer></script>
 
-    <!-- CSS (ดีไซน์ใหม่ทั้งหมด) -->
+    <!-- CSS (ดีไซน์เดิม) -->
     <style>
-        /* 1. CSS Reset และตั้งค่าพื้นฐาน */
         :root {
             --primary-color: #007bff;
             --primary-hover: #0056b3;
@@ -26,23 +24,24 @@
             --light-gray: #f8f9fa;
             --text-color: #333;
             --border-color: #e2e8f0;
+            --status-ready-color: #28a745;
+            --status-error-color: #dc3545;
         }
 
         body {
-            /* ใช้ Font ที่นำเข้า (Inter สำหรับอังกฤษ, Sarabun สำหรับไทย) */
             font-family: 'Inter', 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
             display: flex;
-            flex-direction: column; /* ✅ แก้ไข: จัดเรียงแนวตั้ง */
-            justify-content: center; /* ✅ แก้ไข: จัดกลางแนวตั้ง */
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 40px 20px; /* ✅ แก้ไข: เพิ่ม padding ด้านบน */
+            padding: 40px 20px;
             box-sizing: border-box;
+            position: relative;
         }
 
-        /* ✅✅✅ เพิ่มใหม่: สไตล์สำหรับ Header ของเว็บไซต์ ✅✅✅ */
         .site-header {
             text-align: center;
             color: #ffffff;
@@ -70,32 +69,79 @@
             opacity: 0.9;
             max-width: 500px;
         }
-        /* ✅✅✅ สิ้นสุดส่วนที่เพิ่มใหม่ ✅✅✅ */
 
+        .system-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #ffc107;
+            color: #333;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
 
-        /* 2. การ์ด Container หลัก */
+        .system-status::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #333;
+            display: block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .system-status.ready {
+            background-color: var(--status-ready-color);
+            color: white;
+        }
+        
+        .system-status.ready::before {
+            background-color: white;
+            animation: none;
+        }
+
+        .system-status.error {
+            background-color: var(--status-error-color);
+            color: white;
+        }
+
+        .system-status.error::before {
+            background-color: white;
+            animation: none;
+        }
+
         .container {
             background-color: #ffffff;
             padding: 40px;
-            border-radius: 16px; /* เพิ่มความโค้งมน */
+            border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 480px; /* ขยายเล็กน้อย */
+            max-width: 480px;
             text-align: center;
             box-sizing: border-box;
             transition: all 0.3s ease;
         }
 
-        /* 3. ส่วนหัวข้อ (ภายใน Card) */
-        /* ✅ แก้ไข: เปลี่ยน h1 เป็น .container h2 */
         .container h2 {
             color: var(--text-color);
-            font-size: 1.9rem; /* ใหญ่ขึ้น */
+            font-size: 1.9rem;
             font-weight: 700;
             margin-bottom: 12px;
         }
 
-        /* ✅ แก้ไข: เปลี่ยน p เป็น .container p */
         .container p {
             color: #555;
             font-size: 1rem;
@@ -103,12 +149,11 @@
             line-height: 1.6;
         }
 
-        /* 4. Textarea */
         textarea {
             width: 100%;
             height: 100px;
             padding: 14px;
-            border: 2px solid var(--border-color); /* เส้นขอบที่นุ่มนวลขึ้น */
+            border: 2px solid var(--border-color);
             border-radius: 12px;
             margin-bottom: 25px;
             font-size: 1rem;
@@ -121,10 +166,9 @@
         textarea:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(0,123,255,0.15); /* เพิ่มเงาตอน focus */
+            box-shadow: 0 0 0 4px rgba(0,123,255,0.15);
         }
 
-        /* 5. ปุ่ม (ดีไซน์ใหม่) */
         button {
             border: none;
             padding: 14px 20px;
@@ -139,42 +183,47 @@
             transform: translateY(0);
             transition: all 0.3s ease;
         }
+        
+        button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
 
-        button:hover {
-            transform: translateY(-2px); /* เอฟเฟกต์ลอยเล็กน้อย */
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
 
-        /* ปุ่มสร้าง (สีน้ำเงินไล่เฉด) */
         #generate-btn {
             background: linear-gradient(90deg, #007bff 0%, #00bfff 100%);
             background-size: 200% 100%;
         }
 
-        #generate-btn:hover {
-            background-position: right center; /* เอฟเฟกต์เลื่อนสี */
+        #generate-btn:hover:not(:disabled) {
+            background-position: right center;
         }
 
-        /* ปุ่มดาวน์โหลด (สีเขียวไล่เฉด) */
         #download-btn {
             background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
             background-size: 200% 100%;
             margin-top: 20px;
         }
 
-        #download-btn:hover {
-            background-position: right center; /* เอฟเฟกต์เลื่อนสี */
+        #download-btn:hover:not(:disabled) {
+            background-position: right center;
         }
 
-        /* 6. Container ของ QR Code (เพิ่ม Animation) */
         #qrcode-container {
             margin-top: 30px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
+        
+        /* Container นี้จะมี <canvas> ที่ Library สร้างขึ้นมาใส่ไว้ข้างใน */
 
-        /* Animation Fade-in เมื่อ QR Code ปรากฏ */
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
@@ -184,58 +233,77 @@
         #qrcode-container img {
             margin: 0 auto;
             animation: fadeIn 0.5s ease-out;
-            border-radius: 8px; /* ทำให้ขอบ QR Code มนเล็กน้อย */
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
 
-    <!-- ✅✅✅ เพิ่มใหม่: Header ของเว็บไซต์ ✅✅✅ -->
+    <div id="system-status" class="system-status">
+        <span id="status-text">กำลังตรวจสอบ...</span>
+    </div>
+
     <header class="site-header">
         <h1>ระบบสร้าง QR-Code [CYM-QR]</h1>
         <h2>ต.เวียงทอง อ.สูงเม่น จ.แพร่</h2>
         <p>ระบบนี้ใช้ฟรีไม่มีค่าใช้จ่าย ไม่มีวันหมดอายุ ไม่มีโฆษณา</p>
     </header>
 
-    <!-- ✅ แก้ไข: นี่คือการ์ดเครื่องมือ -->
     <div class="container">
-        <h2>สร้าง QR Code ของคุณ</h2> <!-- ✅ แก้ไข: เปลี่ยนจาก h1 เป็น h2 -->
-        <p>ข้อมูลทั้งหมดประมวลผลในเบราว์เซอร์ของคุณ</p> <!-- ✅ แก้ไข: ปรับข้อความ -->
+        <h2>สร้าง QR Code ของคุณ</h2>
+        <p>ข้อมูลทั้งหมดประมวลผลในเบราว์เซอร์ของคุณ</p>
         
         <textarea id="text-input" placeholder="ป้อน URL หรือข้อความที่นี่..."></textarea>
         
-        <button id="generate-btn">สร้าง QR Code</button>
+        <button id="generate-btn" disabled>กำลังโหลดระบบ...</button>
         
         <div id="qrcode-container"></div>
         
         <button id="download-btn" style="display:none;">ดาวน์โหลด QR Code</button>
     </div>
 
-    <!-- 1. โหลด Library easyqrcodejs (ย้ายไป <head> แล้ว) -->
-
-    <!-- 2. JavaScript (ยังคงใช้ window.onload เพื่อความปลอดภัย) -->
+    
+    <!-- ✅✅✅ สคริปต์หลัก (เขียนใหม่สำหรับ qr-code-styling) ✅✅✅ -->
     <script>
-        // ✅ ใช้ window.onload
-        //    เพื่อให้แน่ใจว่าสคริปต์ใน <head> โหลดเสร็จ 100%
         window.onload = () => {
-
             // --- การตั้งค่า ---
-            const qrCodeSize = 300; // ขนาด QR Code (กว้าง x สูง)
-            const logoSize = 80;    // ขนาดโลโก้
-            const logoURL = 'logo.png'; // ชี้ไปที่ไฟล์ logo.png
+            const qrCodeSize = 300;
+            
+            // ✅ ใช้ลิงก์โลโก้ที่คุณให้มา
+            // (หากยังเจอปัญหา CORS ให้ใช้วิธีอัปโหลด logo.png ไปที่ GitHub
+            // แล้วเปลี่ยนบรรทัดนี้เป็น const logoURL = 'logo.png';)
+            const logoURL = 'https://img2.pic.in.th/pic/-Ver.3-1.th.png'; 
             
             const textInput = document.getElementById('text-input');
             const generateBtn = document.getElementById('generate-btn');
             const qrContainer = document.getElementById('qrcode-container');
             const downloadBtn = document.getElementById('download-btn');
+            const systemStatusDiv = document.getElementById('system-status');
+            const statusTextSpan = document.getElementById('status-text');
 
-            let qrcodeInstance = null; 
+            let qrCodeStylingInstance = null; // ตัวแปรสำหรับเก็บ QR Code instance
 
+            // --- ตรวจสอบสถานะ Library (ตัวใหม่) ---
+            if (typeof QRCodeStyling !== 'undefined') {
+                // ✅ ถ้าโหลดสำเร็จ
+                statusTextSpan.textContent = 'พร้อมใช้งาน';
+                systemStatusDiv.classList.add('ready');
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'สร้าง QR Code';
+            } else {
+                // ❌ ถ้าโหลดไม่สำเร็จ
+                statusTextSpan.textContent = 'ไม่พร้อมใช้งาน (Library โหลดไม่ได้)';
+                systemStatusDiv.classList.add('error');
+                generateBtn.disabled = true;
+                generateBtn.textContent = 'ระบบไม่พร้อมใช้งาน';
+                console.error("QRCodeStyling is not defined. Library failed to load.");
+            }
+
+            // --- การทำงานของปุ่มสร้าง ---
             generateBtn.addEventListener('click', () => {
                 
-                // ตรวจสอบอีกครั้งเพื่อความปลอดภัย
-                if (typeof EasyQRCodeJS === 'undefined') {
-                    alert('ข้อผิดพลาด: Library สำหรับสร้าง QR Code โหลดไม่สำเร็จ กรุณาลองรีเฟรชหน้าใหม่อีกครั้ง');
+                if (typeof QRCodeStyling === 'undefined') {
+                    alert('ข้อผิดพลาด: Library สำหรับสร้าง QR Code ยังไม่พร้อมใช้งาน กรุณาลองรีเฟรชหน้าใหม่อีกครั้ง');
                     return;
                 }
 
@@ -246,40 +314,71 @@
                     return;
                 }
 
-                qrContainer.innerHTML = '';
+                qrContainer.innerHTML = ''; // ล้าง QR Code เก่า
                 downloadBtn.style.display = 'none';
 
-                const options = {
-                    text: text,
+                // --- สร้าง QR Code ด้วย Library ใหม่ ---
+                qrCodeStylingInstance = new QRCodeStyling({
                     width: qrCodeSize,
                     height: qrCodeSize,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: EasyQRCodeJS.CorrectLevel.H, 
-                    
-                    logo: logoURL,
-                    logoWidth: logoSize,
-                    logoHeight: logoSize,
-                    logoBackgroundTransparent: true 
-                };
+                    data: text, // ข้อมูลที่จะใส่
+                    image: logoURL, // ลิงก์โลโก้
+                    dotsOptions: {
+                        color: "#000000",
+                        type: "rounded" // ทำให้จุด QR Code มนๆ
+                    },
+                    backgroundOptions: {
+                        color: "#ffffff",
+                    },
+                    imageOptions: {
+                        crossOrigin: "anonymous", // สำคัญมากสำหรับ CORS
+                        margin: 8, // ระยะห่างขอบโลโก้
+                        imageSize: 0.25 // ขนาดโลโก้ (25% ของขนาด QR Code)
+                    },
+                    qrOptions: {
+                        errorCorrectionLevel: 'H' // ระดับ H เพื่อให้ใส่โลโก้ได้
+                    }
+                });
 
                 try {
-                    qrcodeInstance = new EasyQRCodeJS(qrContainer, options);
+                    // นำ QR Code (ที่เป็น Canvas) ไปใส่ใน Div
+                    qrCodeStylingInstance.append(qrContainer);
                     downloadBtn.style.display = 'inline-block';
                 } catch (error) {
-                    // หากยังเกิด Error ที่นี่ แสดงว่า CDN (cdnjs) อาจถูกบล็อก
-                    console.error("เกิดข้อผิดพลาด:", error);
-                    alert('เกิดข้อผิดพลาดในการสร้าง QR Code ตรวจสอบว่าไฟล์โลโก้ถูกต้องหรือไม่');
+                    console.error("เกิดข้อผิดพลาดในการสร้าง QR Code:", error);
+                    alert('เกิดข้อผิดพลาดในการสร้าง QR Code ตรวจสอบว่าไฟล์โลโก้ถูกต้องหรือไม่ (อาจเป็นปัญหา CORS)');
+                    systemStatusDiv.classList.add('error');
+                    statusTextSpan.textContent = 'มีข้อผิดพลาด (CORS)';
                 }
             });
 
+            // --- การทำงานของปุ่มดาวน์โหลด (เขียนใหม่) ---
             downloadBtn.addEventListener('click', () => {
-                if (qrcodeInstance) {
-                    qrcodeInstance.download('qrcode-with-logo'); 
+                if (qrCodeStylingInstance) {
+                    // ใช้ .getRawData('png') ซึ่งจะคืนค่าเป็น Promise
+                    qrCodeStylingInstance.getRawData('png')
+                        .then((blob) => {
+                            if (blob) {
+                                // สร้าง URL ชั่วคราวจาก Blob
+                                const url = URL.createObjectURL(blob);
+                                // สร้างแท็ก <a> เพื่อดาวน์โหลด
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = 'qrcode-with-logo.png';
+                                document.body.appendChild(a);
+                                a.click(); // สั่งคลิก
+                                document.body.removeChild(a); // ลบแท็กทิ้ง
+                                URL.revokeObjectURL(url); // คืนหน่วยความจำ
+                            }
+                        })
+                        .catch((err) => {
+                            console.error("Download error:", err);
+                            alert("เกิดข้อผิดพลาดในการดาวน์โหลดไฟล์");
+                        });
                 }
             });
 
-        }; // ✅ สิ้นสุด window.onload
+        }; // สิ้นสุด window.onload
     </script>
 </body>
 </html>
