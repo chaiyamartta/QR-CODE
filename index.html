@@ -270,8 +270,9 @@
     <script>
         window.onload = () => {
             // --- การตั้งค่า ---
-            const qrCodeSize = 4; // Library นี้ใช้ Type Number (0-40) ไม่ใช่ Pixel Size
-            const errorCorrectionLevel = 'H'; // L, M, Q, H
+            // ✅ แก้ไข: ตั้งเป็น 0 เพื่อให้ Library คำนวณ Type Number (ขนาด) อัตโนมัติ
+            const qrCodeSize = 0; 
+            const errorCorrectionLevel = 'H'; // L, M, Q, H (ใช้ 'H' เผื่อใส่โลโก้ในอนาคต)
             const cellSize = 8; // ขนาดแต่ละจุด QR Code (pixel) ลองปรับค่านี้ดู
             // const logoURL = 'https://img2.pic.in.th/pic/-Ver.3-1.th.png'; // โลโก้ยังไม่รองรับในขั้นตอนนี้
             
@@ -333,7 +334,8 @@
 
                 } catch (error) {
                     console.error("เกิดข้อผิดพลาดในการสร้าง QR Code:", error);
-                    alert('เกิดข้อผิดพลาดในการสร้าง QR Code: ' + error.message);
+                    // ✅ แก้ไข: แสดง error ที่ได้รับมาโดยตรง
+                    alert('เกิดข้อผิดพลาดในการสร้าง QR Code: ' + error); 
                     systemStatusDiv.classList.add('error');
                     statusTextSpan.textContent = 'มีข้อผิดพลาด';
                 }
