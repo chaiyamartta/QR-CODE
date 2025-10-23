@@ -5,22 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบสร้าง QR-Code [CYM-QR]</title>
     
-    <!-- ✅ แก้ไข: เปลี่ยน Font เป็น Sarabun (400, 600, 700) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Font Sarabun (400, 600, 700) --><link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <!-- Library qrcode-generator -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
+    <!-- Library qrcode-generator (ยังคงใช้ตัวเดิมที่เสถียร) --><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
 
-    <!-- CSS (ดีไซน์ที่ปรับปรุงใหม่) -->
-    <style>
+    <!-- CSS (ดีไซน์ใหม่ - ธีมวัด + Animation) --><style>
         :root {
-            /* ✅ แก้ไข: เปลี่ยนชุดสีปุ่ม */
-            --primary-color-start: #b8860b; /* DarkGoldenRod */
-            --primary-color-end: #daa520;   /* GoldenRod */
-            --success-color-start: #556b2f; /* DarkOliveGreen */
-            --success-color-end: #6b8e23;   /* OliveDrab */
+            --primary-color-start: #FFD700; /* Gold */
+            --primary-color-end: #F5B760;   /* Light Gold */
+            --success-color-start: #16a34a; /* Green-600 */
+            --success-color-end: #15803d;   /* Green-700 */
             
             --light-gray: #f8f9fa;
             --text-color: #333;
@@ -28,13 +24,12 @@
             --status-ready-color: #28a745;
             --status-error-color: #dc3545;
             
-            /* ✅ แก้ไข: สีพื้นหลังและสีหัวข้อใหม่ */
-            --background-color: #fdfaf5; /* สีครีมอ่อน / Off-white อมเหลือง */
-            --header-text-color: #5d4037; /* สีน้ำตาลเข้ม */
+            --background-color: #fdfcf7; /* สีครีม-เบจ อ่อน */
+            --header-text-color: #5D4037; /* สีน้ำตาลเข้ม */
+            --button-text-color: #333; /* สีตัวอักษรปุ่ม (สีเข้ม) */
         }
 
         body {
-            /* ✅ แก้ไข: เปลี่ยน Font และ สีพื้นหลัง */
             font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--background-color);
             display: flex;
@@ -50,10 +45,9 @@
 
         .site-header {
             text-align: center;
-            /* ✅ แก้ไข: เปลี่ยนสีตัวอักษรและเงา */
             color: var(--header-text-color); 
             margin-bottom: 30px;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         .site-header h1 {
@@ -74,10 +68,10 @@
             font-weight: 400;
             margin: 8px 0 0 0;
             opacity: 0.9;
-            max-width: 500px;
+            max-width: 550px;
         }
 
-        /* --- ส่วนของ Status (คงเดิม) --- */
+        /* --- ส่วนของ Status --- */
         .system-status {
             position: absolute;
             top: 20px;
@@ -132,13 +126,14 @@
         }
         /* --- สิ้นสุดส่วน Status --- */
 
+        /* ส่วนเนื้อหาเว็บ */
         .container {
             background-color: #ffffff;
             padding: 40px;
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 25px rgba(93, 64, 55, 0.1); 
             width: 100%;
-            max-width: 480px;
+            max-width: 550px;
             text-align: center;
             box-sizing: border-box;
             transition: all 0.3s ease;
@@ -174,8 +169,8 @@
 
         textarea:focus {
             outline: none;
-            border-color: var(--primary-color-start); /* เปลี่ยนสี focus เป็นสีทอง */
-            box-shadow: 0 0 0 4px rgba(184, 134, 11, 0.15); /* เงา focus สีทอง */
+            border-color: var(--primary-color-start); 
+            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.2); 
         }
 
         button {
@@ -187,7 +182,7 @@
             font-family: inherit; /* ใช้ Font Sarabun */
             cursor: pointer;
             width: 100%;
-            color: white;
+            color: var(--button-text-color); 
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             transform: translateY(0);
             transition: all 0.3s ease;
@@ -198,6 +193,7 @@
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
+            color: white;
         }
 
         button:hover:not(:disabled) {
@@ -205,22 +201,20 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
 
-        /* ✅ แก้ไข: สีปุ่ม "สร้าง" (โทนสีทอง) */
         #generate-btn {
             background: linear-gradient(90deg, var(--primary-color-start) 0%, var(--primary-color-end) 100%);
             background-size: 200% 100%;
-            color: white; /* ตัวอักษรสีขาว */
         }
 
         #generate-btn:hover:not(:disabled) {
             background-position: right center;
         }
 
-        /* ✅ แก้ไข: สีปุ่ม "ดาวน์โหลด" (โทนสีเขียว) */
         #download-btn {
             background: linear-gradient(90deg, var(--success-color-start) 0%, var(--success-color-end) 100%);
             background-size: 200% 100%;
             margin-top: 20px;
+            color: white; 
         }
 
         #download-btn:hover:not(:disabled) {
@@ -230,23 +224,90 @@
         #qrcode-container {
             margin-top: 30px;
             display: flex;
+            flex-direction: column; /* จัดองค์ประกอบแนวตั้ง */
             justify-content: center;
             align-items: center;
-            min-height: 300px; 
             width: 100%;
+            position: relative; /* สำหรับตำแหน่ง Loader */
+        }
+        
+        .qr-placeholder-text {
+            color: #aaa;
+            font-size: 1rem;
+            font-weight: 400;
+            padding: 80px 20px; 
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
         }
         
         #qrcode-container img {
+           display: none; 
+        }
+        
+        #qr-canvas {
             max-width: 100%;
             height: auto;
             border-radius: 8px;
-            animation: fadeIn 0.5s ease-out;
+            /* Animation การปรากฏ */
+            animation: fadeInScale 0.5s ease-out forwards; 
+            display: none; 
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
+        /* ✅ เพิ่ม Animation สำหรับ Canvas */
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
+
+        /* ✅ เพิ่ม Loader */
+        .qr-loader {
+            display: none; /* ซ่อนในตอนแรก */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            width: 100%;
+            box-sizing: border-box;
+            color: #555;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .qr-loader .spinner {
+            border: 5px solid #f3f3f3; /* Light grey */
+            border-top: 5px solid var(--primary-color-start); /* Gold */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ส่วนท้ายเว็ป (Footer) */
+        .site-footer-credit {
+            width: 100%;
+            max-width: 550px; 
+            text-align: center;
+            margin-top: 30px; 
+            padding: 10px;
+            color: var(--header-text-color); 
+            opacity: 0.75; 
+        }
+
+        .site-footer-credit p {
+            margin: 0;
+            font-size: 0.9rem; 
+            font-weight: 400;
+        }
+
     </style>
 </head>
 <body>
@@ -255,33 +316,46 @@
         <span id="status-text">กำลังตรวจสอบ...</span>
     </div>
 
-    <header class="site-header">
+    <!-- =========== 1. หัวเว็บ (Header) =========== --><header class="site-header">
         <h1>ระบบสร้าง QR-Code [CYM-QR]</h1>
         <h2>ต.เวียงทอง อ.สูงเม่น จ.แพร่</h2>
         <p>ระบบนี้ใช้ฟรีไม่มีค่าใช้จ่าย ไม่มีวันหมดอายุ ไม่มีโฆษณา</p>
     </header>
 
-    <div class="container">
-        <p>ป้อน URL หรือข้อความที่นี่...</p>
+    <!-- =========== 2. เนื้อหาเว็ป (Main Content) =========== --><div class="container">
+        <h2>สร้าง QR Code ของคุณ</h2>
+        <p>ข้อมูลทั้งหมดประมวลผลในเบราว์เซอร์ของคุณ</p>
         
         <textarea id="text-input" placeholder="ป้อน URL หรือข้อความที่นี่..."></textarea>
         
         <button id="generate-btn" disabled>กำลังโหลดระบบ...</button>
         
-        <!-- Library นี้จะสร้าง <img> tag ใส่ในนี้ -->
-        <div id="qrcode-container"></div> 
+        <!-- ✅ เพิ่ม Loader และ Placeholder --><div id="qrcode-container">
+            <canvas id="qr-canvas"></canvas>
+            <p id="qr-placeholder" class="qr-placeholder-text">QR Code ของคุณจะแสดงที่นี่</p>
+            <div id="qr-loader" class="qr-loader">
+                <div class="spinner"></div>
+                <p>โปรดรอสักครู่ กำลังสร้าง QR Code...</p>
+            </div>
+        </div> 
         
         <button id="download-btn" style="display:none;">ดาวน์โหลด QR Code</button>
     </div>
 
+    <!-- =========== 3. ท้ายเว็ป (Footer) =========== --><footer class="site-footer-credit">
+        <p>© 2025 วัดไชยามาตย์ | ต.เวียงทอง อ.สูงเม่น จ.แพร่</p>
+    </footer>
     
-    <!-- สคริปต์หลัก (qrcode-generator) -->
-    <script>
+    <!-- ✅ แก้ไข: สคริปต์หลักทั้งหมด (ปรับการแสดงผล Canvas/Placeholder/Loader) --><script>
         window.onload = () => {
             // --- การตั้งค่า ---
             const qrCodeSize = 0; // 0 = Auto-detect size
-            const errorCorrectionLevel = 'H'; // H = High (ดีที่สุดสำหรับการใส่โลโก้ในอนาคต)
-            const cellSize = 8; // ขนาดของจุด (pixel)
+            const errorCorrectionLevel = 'H'; // H = High (จำเป็นสำหรับโลโก้)
+            const cellSize = 10; // ขนาดของจุด (pixel) (เพิ่มขนาดให้ชัดขึ้น)
+            
+            // --- การตั้งค่าโลโก้ ---
+            const logoURL_primary = 'https://img2.pic.in.th/pic/-Ver.3-1.th.png'; // ลิงก์จากเน็ต
+            const logoURL_fallback = 'logo.png'; // ไฟล์ที่อัปโหลด (แนะนำให้อัปโหลดไฟล์นี้ไปด้วย)
             
             const textInput = document.getElementById('text-input');
             const generateBtn = document.getElementById('generate-btn');
@@ -289,6 +363,13 @@
             const downloadBtn = document.getElementById('download-btn');
             const systemStatusDiv = document.getElementById('system-status');
             const statusTextSpan = document.getElementById('status-text');
+
+            // Canvas สำหรับวาด QR Code + Logo
+            const canvas = document.getElementById('qr-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const qrPlaceholder = document.getElementById('qr-placeholder');
+            const qrLoader = document.getElementById('qr-loader'); // ✅ เพิ่ม: Loader Element
 
             // --- ตรวจสอบสถานะ Library (qrcode) ---
             if (typeof qrcode !== 'undefined') {
@@ -304,8 +385,29 @@
                 console.error("qrcode function is not defined. Library failed to load.");
             }
 
+            // --- ฟังก์ชันวาดโลโก้ลงบน Canvas ---
+            function drawLogoOnCanvas(logo) {
+                const canvasSize = canvas.width;
+                const logoSize = canvasSize * 0.25; // ขนาดโลโก้ 25%
+                const logoX = (canvasSize - logoSize) / 2;
+                const logoY = (canvasSize - logoSize) / 2;
+                const borderSize = 5; // ขอบสีขาวรอบโลโก้ 5px
+
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(
+                    logoX - borderSize, 
+                    logoY - borderSize, 
+                    logoSize + (borderSize * 2), 
+                    logoSize + (borderSize * 2)
+                );
+                
+                ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+
+                downloadBtn.style.display = 'inline-block';
+            }
+
             // --- การทำงานของปุ่มสร้าง ---
-            generateBtn.addEventListener('click', () => {
+            generateBtn.addEventListener('click', async () => { // ✅ เพิ่ม async
                 
                 if (typeof qrcode === 'undefined') {
                     alert('ข้อผิดพลาด: Library สำหรับสร้าง QR Code ยังไม่พร้อมใช้งาน กรุณาลองรีเฟรชหน้าใหม่อีกครั้ง');
@@ -313,49 +415,116 @@
                 }
 
                 const text = textInput.value;
-
                 if (!text) {
                     alert('กรุณาป้อน URL หรือข้อความ');
                     return;
                 }
+                
+                // ✅ แสดง Loader, ซ่อน Placeholder และ Canvas
+                qrPlaceholder.style.display = 'none';
+                canvas.style.display = 'none'; // ซ่อน Canvas ก่อนสร้าง
+                qrLoader.style.display = 'flex'; // แสดง Loader
 
-                qrContainer.innerHTML = ''; // ล้าง QR Code เก่า
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // ล้าง canvas
                 downloadBtn.style.display = 'none';
 
                 try {
-                    // --- สร้าง QR Code ---
+                    // 1. สร้าง QR Code (แบบ Data URL)
                     const qr = qrcode(qrCodeSize, errorCorrectionLevel);
                     qr.addData(text);
                     qr.make();
+                    const qrDataURL = qr.createDataURL(cellSize); 
                     
-                    const imgTag = qr.createDataURL(cellSize); 
+                    // 2. โหลด Data URL นั้นลงใน <img> ชั่วคราว
+                    const qrImg = new Image();
+                    qrImg.src = qrDataURL;
+
+                    await new Promise(resolve => qrImg.onload = resolve); // ✅ รอให้ QR Img โหลดเสร็จ
+
+                    // 3. เมื่อ <img> โหลดเสร็จ, วาดลง Canvas
+                    canvas.width = qrImg.width;
+                    canvas.height = qrImg.height;
+                    ctx.drawImage(qrImg, 0, 0);
+
+                    // 4. เริ่มกระบวนการโหลดโลโก้
+                    const logo = new Image();
+                    logo.crossOrigin = 'anonymous'; // สำคัญมากสำหรับ CORS
                     
-                    const imgElement = document.createElement('img');
-                    imgElement.src = imgTag;
-                    qrContainer.appendChild(imgElement);
+                    let logoLoaded = false;
                     
-                    downloadBtn.style.display = 'inline-block';
+                    // 5. เมื่อโลโก้โหลดสำเร็จ -> วาดโลโก้
+                    logo.onload = () => {
+                        drawLogoOnCanvas(logo);
+                        logoLoaded = true;
+                    };
+                    
+                    // 6. หากโหลดโลโก้ (จากเน็ต) ล้มเหลว
+                    logo.onerror = async () => { // ✅ เพิ่ม async
+                        console.warn('โหลดโลโก้จากลิงก์หลักล้มเหลว (CORS?), กำลังลองไฟล์ fallback (logo.png)...');
+                        // 6a. ลองโหลดจาก 'logo.png' (ไฟล์ที่อัปโหลด)
+                        const fallbackLogo = new Image();
+                        fallbackLogo.onload = () => {
+                            drawLogoOnCanvas(fallbackLogo);
+                            logoLoaded = true;
+                        };
+                        // 6b. ถ้า fallback ก็ล้มเหลว -> ไม่ต้องทำอะไร (QR Code จะไม่มีโลโก้)
+                        fallbackLogo.onerror = () => {
+                            console.error('โหลดไฟล์ fallback "logo.png" ล้มเหลว');
+                            alert('ไม่สามารถโหลดโลโก้ได้ (ทั้งจากลิงก์และไฟล์สำรอง) แต่ QR Code ยังใช้งานได้');
+                            downloadBtn.style.display = 'inline-block'; // ยังให้ดาวน์โหลดได้ (แบบไม่มีโลโก้)
+                            logoLoaded = true; // ตั้งเป็น true เพื่อให้ await Promise.all ดำเนินต่อ
+                        }
+                        fallbackLogo.src = logoURL_fallback;
+
+                        await new Promise(resolve => { // ✅ รอให้ fallback โหลดเสร็จ
+                            fallbackLogo.onload = resolve;
+                            fallbackLogo.onerror = resolve; // Resolve แม้จะ Error เพื่อให้โปรแกรมดำเนินต่อ
+                        });
+                    };
+
+                    // 7. เริ่มโหลดโลโก้ (จากลิงก์เน็ต)
+                    logo.src = logoURL_primary;
+
+                    await new Promise(resolve => { // ✅ รอให้โลโก้หลักโหลดเสร็จ
+                        logo.onload = resolve;
+                        logo.onerror = resolve; // Resolve แม้จะ Error เพื่อให้โปรแกรมดำเนินต่อ
+                    });
+
+                    // ตรวจสอบอีกครั้งว่าโลโก้โหลดสำเร็จหรือไม่
+                    if (!logoLoaded) {
+                        alert('ไม่สามารถโหลดโลโก้ได้ (ทั้งจากลิงก์และไฟล์สำรอง) แต่ QR Code ยังใช้งานได้');
+                        downloadBtn.style.display = 'inline-block';
+                    }
+
+                    canvas.style.display = 'block'; // แสดง Canvas เมื่อสร้างเสร็จ
+                    qrLoader.style.display = 'none'; // ซ่อน Loader
 
                 } catch (error) {
                     console.error("เกิดข้อผิดพลาดในการสร้าง QR Code:", error);
                     alert('เกิดข้อผิดพลาดในการสร้าง QR Code: ' + error); 
                     systemStatusDiv.classList.add('error');
                     statusTextSpan.textContent = 'มีข้อผิดพลาด';
+                    
+                    // ✅ ซ่อน Canvas และ Loader, แสดง Placeholder คืน
+                    canvas.style.display = 'none';
+                    qrLoader.style.display = 'none';
+                    qrPlaceholder.style.display = 'block';
                 }
             });
 
             // --- การทำงานของปุ่มดาวน์โหลด ---
             downloadBtn.addEventListener('click', () => {
-                const imgElement = qrContainer.querySelector('img');
-                if (imgElement && imgElement.src) {
+                try {
+                    const dataURL = canvas.toDataURL('image/png');
                     const a = document.createElement('a');
-                    a.href = imgElement.src;
-                    a.download = 'qrcode.png';
+                    a.href = dataURL;
+                    a.download = 'qrcode-with-logo.png';
                     document.body.appendChild(a);
                     a.click(); 
                     document.body.removeChild(a); 
-                } else {
-                     alert("เกิดข้อผิดพลาด: ไม่พบรูปภาพ QR Code ที่จะดาวน์โหลด");
+                } catch (error) {
+                     alert("เกิดข้อผิดพลาด: ไม่สามารถดาวน์โหลดรูปภาพจาก Canvas ได้");
+                     console.error("Canvas download error:", error);
                 }
             });
 
