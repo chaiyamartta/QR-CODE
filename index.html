@@ -10,9 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- ✅✅✅ เปลี่ยน Library ใหม่! ✅✅✅ -->
-    <!-- ใช้ 'qr-code-styling' แทน 'easyqrcodejs' -->
-    <script src="https://unpkg.com/qr-code-styling@1.6.0/qr-code-styling.js" defer></script>
+    <!-- ✅✅✅ เปลี่ยน Library ตัวที่ 3: qrcode-generator ✅✅✅ -->
+    <!-- โหลดจาก CDN (cdnjs) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
 
     <!-- CSS (ดีไซน์เดิม) -->
     <style>
@@ -74,7 +74,7 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            background-color: #ffc107;
+            background-color: #ffc107; /* สีเหลือง: กำลังตรวจสอบ */
             color: #333;
             padding: 8px 15px;
             border-radius: 8px;
@@ -104,7 +104,7 @@
         }
 
         .system-status.ready {
-            background-color: var(--status-ready-color);
+            background-color: var(--status-ready-color); /* สีเขียว: พร้อม */
             color: white;
         }
         
@@ -114,7 +114,7 @@
         }
 
         .system-status.error {
-            background-color: var(--status-error-color);
+            background-color: var(--status-error-color); /* สีแดง: ไม่พร้อม */
             color: white;
         }
 
@@ -220,20 +220,22 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            /* ทำให้มีขนาดพอดีกับ QR Code ที่จะสร้าง */
+            min-height: 300px; 
+            width: 100%;
         }
         
-        /* Container นี้จะมี <canvas> ที่ Library สร้างขึ้นมาใส่ไว้ข้างใน */
+        #qrcode-container img {
+             /* ขนาดของ img จะถูกกำหนดโดย library */
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease-out;
+        }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
-        }
-
-        #qrcode-container canvas,
-        #qrcode-container img {
-            margin: 0 auto;
-            animation: fadeIn 0.5s ease-out;
-            border-radius: 8px;
         }
     </style>
 </head>
@@ -257,22 +259,21 @@
         
         <button id="generate-btn" disabled>กำลังโหลดระบบ...</button>
         
-        <div id="qrcode-container"></div>
+        <!-- Library นี้จะสร้าง <img> tag ใส่ในนี้ -->
+        <div id="qrcode-container"></div> 
         
         <button id="download-btn" style="display:none;">ดาวน์โหลด QR Code</button>
     </div>
 
     
-    <!-- ✅✅✅ สคริปต์หลัก (เขียนใหม่สำหรับ qr-code-styling) ✅✅✅ -->
+    <!-- ✅✅✅ สคริปต์หลัก (เขียนใหม่สำหรับ qrcode-generator) ✅✅✅ -->
     <script>
         window.onload = () => {
             // --- การตั้งค่า ---
-            const qrCodeSize = 300;
-            
-            // ✅ ใช้ลิงก์โลโก้ที่คุณให้มา
-            // (หากยังเจอปัญหา CORS ให้ใช้วิธีอัปโหลด logo.png ไปที่ GitHub
-            // แล้วเปลี่ยนบรรทัดนี้เป็น const logoURL = 'logo.png';)
-            const logoURL = 'https://img2.pic.in.th/pic/-Ver.3-1.th.png'; 
+            const qrCodeSize = 4; // Library นี้ใช้ Type Number (0-40) ไม่ใช่ Pixel Size
+            const errorCorrectionLevel = 'H'; // L, M, Q, H
+            const cellSize = 8; // ขนาดแต่ละจุด QR Code (pixel) ลองปรับค่านี้ดู
+            // const logoURL = 'https://img2.pic.in.th/pic/-Ver.3-1.th.png'; // โลโก้ยังไม่รองรับในขั้นตอนนี้
             
             const textInput = document.getElementById('text-input');
             const generateBtn = document.getElementById('generate-btn');
@@ -281,10 +282,8 @@
             const systemStatusDiv = document.getElementById('system-status');
             const statusTextSpan = document.getElementById('status-text');
 
-            let qrCodeStylingInstance = null; // ตัวแปรสำหรับเก็บ QR Code instance
-
-            // --- ตรวจสอบสถานะ Library (ตัวใหม่) ---
-            if (typeof QRCodeStyling !== 'undefined') {
+            // --- ตรวจสอบสถานะ Library (ตัวใหม่ qrcode) ---
+            if (typeof qrcode !== 'undefined') {
                 // ✅ ถ้าโหลดสำเร็จ
                 statusTextSpan.textContent = 'พร้อมใช้งาน';
                 systemStatusDiv.classList.add('ready');
@@ -296,13 +295,13 @@
                 systemStatusDiv.classList.add('error');
                 generateBtn.disabled = true;
                 generateBtn.textContent = 'ระบบไม่พร้อมใช้งาน';
-                console.error("QRCodeStyling is not defined. Library failed to load.");
+                console.error("qrcode function is not defined. Library failed to load.");
             }
 
             // --- การทำงานของปุ่มสร้าง ---
             generateBtn.addEventListener('click', () => {
                 
-                if (typeof QRCodeStyling === 'undefined') {
+                if (typeof qrcode === 'undefined') {
                     alert('ข้อผิดพลาด: Library สำหรับสร้าง QR Code ยังไม่พร้อมใช้งาน กรุณาลองรีเฟรชหน้าใหม่อีกครั้ง');
                     return;
                 }
@@ -317,64 +316,41 @@
                 qrContainer.innerHTML = ''; // ล้าง QR Code เก่า
                 downloadBtn.style.display = 'none';
 
-                // --- สร้าง QR Code ด้วย Library ใหม่ ---
-                qrCodeStylingInstance = new QRCodeStyling({
-                    width: qrCodeSize,
-                    height: qrCodeSize,
-                    data: text, // ข้อมูลที่จะใส่
-                    image: logoURL, // ลิงก์โลโก้
-                    dotsOptions: {
-                        color: "#000000",
-                        type: "rounded" // ทำให้จุด QR Code มนๆ
-                    },
-                    backgroundOptions: {
-                        color: "#ffffff",
-                    },
-                    imageOptions: {
-                        crossOrigin: "anonymous", // สำคัญมากสำหรับ CORS
-                        margin: 8, // ระยะห่างขอบโลโก้
-                        imageSize: 0.25 // ขนาดโลโก้ (25% ของขนาด QR Code)
-                    },
-                    qrOptions: {
-                        errorCorrectionLevel: 'H' // ระดับ H เพื่อให้ใส่โลโก้ได้
-                    }
-                });
-
                 try {
-                    // นำ QR Code (ที่เป็น Canvas) ไปใส่ใน Div
-                    qrCodeStylingInstance.append(qrContainer);
+                    // --- สร้าง QR Code ด้วย Library ใหม่ ---
+                    const qr = qrcode(qrCodeSize, errorCorrectionLevel);
+                    qr.addData(text);
+                    qr.make();
+                    
+                    // สร้าง QR Code เป็น Data URL (base64) และแสดงผลใน <img>
+                    const imgTag = qr.createDataURL(cellSize); // cellSize คือขนาด pixel ของแต่ละ module
+                    
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imgTag;
+                    qrContainer.appendChild(imgElement);
+                    
                     downloadBtn.style.display = 'inline-block';
+
                 } catch (error) {
                     console.error("เกิดข้อผิดพลาดในการสร้าง QR Code:", error);
-                    alert('เกิดข้อผิดพลาดในการสร้าง QR Code ตรวจสอบว่าไฟล์โลโก้ถูกต้องหรือไม่ (อาจเป็นปัญหา CORS)');
+                    alert('เกิดข้อผิดพลาดในการสร้าง QR Code: ' + error.message);
                     systemStatusDiv.classList.add('error');
-                    statusTextSpan.textContent = 'มีข้อผิดพลาด (CORS)';
+                    statusTextSpan.textContent = 'มีข้อผิดพลาด';
                 }
             });
 
-            // --- การทำงานของปุ่มดาวน์โหลด (เขียนใหม่) ---
+            // --- การทำงานของปุ่มดาวน์โหลด ---
             downloadBtn.addEventListener('click', () => {
-                if (qrCodeStylingInstance) {
-                    // ใช้ .getRawData('png') ซึ่งจะคืนค่าเป็น Promise
-                    qrCodeStylingInstance.getRawData('png')
-                        .then((blob) => {
-                            if (blob) {
-                                // สร้าง URL ชั่วคราวจาก Blob
-                                const url = URL.createObjectURL(blob);
-                                // สร้างแท็ก <a> เพื่อดาวน์โหลด
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = 'qrcode-with-logo.png';
-                                document.body.appendChild(a);
-                                a.click(); // สั่งคลิก
-                                document.body.removeChild(a); // ลบแท็กทิ้ง
-                                URL.revokeObjectURL(url); // คืนหน่วยความจำ
-                            }
-                        })
-                        .catch((err) => {
-                            console.error("Download error:", err);
-                            alert("เกิดข้อผิดพลาดในการดาวน์โหลดไฟล์");
-                        });
+                const imgElement = qrContainer.querySelector('img');
+                if (imgElement && imgElement.src) {
+                    const a = document.createElement('a');
+                    a.href = imgElement.src;
+                    a.download = 'qrcode.png'; // Library นี้สร้าง PNG เสมอ
+                    document.body.appendChild(a);
+                    a.click(); 
+                    document.body.removeChild(a); 
+                } else {
+                     alert("เกิดข้อผิดพลาด: ไม่พบรูปภาพ QR Code ที่จะดาวน์โหลด");
                 }
             });
 
