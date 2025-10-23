@@ -10,6 +10,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
 
+    <!-- 
+      ✅✅✅ แก้ไข: เปลี่ยน CDN กลับไปเป็น jsdelivr ✅✅✅
+      (ยังคงไว้ใน <head> และลบ 'defer' ออก)
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.5.0/dist/easy.qrcode.min.js"></script>
+
     <!-- CSS (ดีไซน์ใหม่ทั้งหมด) -->
     <style>
         /* 1. CSS Reset และตั้งค่าพื้นฐาน */
@@ -164,12 +170,13 @@
         <button id="download-btn" style="display:none;">ดาวน์โหลด QR Code</button>
     </div>
 
-    <!-- 1. โหลด Library easyqrcodejs จาก CDN (cdnj) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/easy-qrcode-js/4.5.0/easy.qrcode.min.js"></script>
+    <!-- 1. โหลด Library easyqrcodejs (ย้ายไป <head> แล้ว) -->
 
-    <!-- 2. JavaScript (โค้ดเดิม ไม่เปลี่ยนแปลง) -->
+    <!-- 2. JavaScript (ยังคงใช้ window.onload เพื่อความปลอดภัย) -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        // ✅ ใช้ window.onload
+        //    เพื่อให้แน่ใจว่าสคริปต์ใน <head> โหลดเสร็จ 100%
+        window.onload = () => {
 
             // --- การตั้งค่า ---
             const qrCodeSize = 300; // ขนาด QR Code (กว้าง x สูง)
@@ -185,11 +192,12 @@
 
             generateBtn.addEventListener('click', () => {
                 
+                // ตรวจสอบอีกครั้งเพื่อความปลอดภัย
                 if (typeof EasyQRCodeJS === 'undefined') {
                     alert('ข้อผิดพลาด: Library สำหรับสร้าง QR Code โหลดไม่สำเร็จ กรุณาลองรีเฟรชหน้าใหม่อีกครั้ง');
                     return;
                 }
-                
+
                 const text = textInput.value;
 
                 if (!text) {
@@ -218,6 +226,7 @@
                     qrcodeInstance = new EasyQRCodeJS(qrContainer, options);
                     downloadBtn.style.display = 'inline-block';
                 } catch (error) {
+                    // หากยังเกิด Error ที่นี่ แสดงว่า CDN (cdnjs) อาจถูกบล็อก
                     console.error("เกิดข้อผิดพลาด:", error);
                     alert('เกิดข้อผิดพลาดในการสร้าง QR Code ตรวจสอบว่าไฟล์โลโก้ถูกต้องหรือไม่');
                 }
@@ -229,7 +238,7 @@
                 }
             });
 
-        }); // สิ้นสุด DOMContentLoaded
+        }; // ✅ สิ้นสุด window.onload
     </script>
 </body>
 </html>
