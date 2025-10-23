@@ -5,32 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบสร้าง QR-Code [CYM-QR]</title>
     
-    <!-- Import Google Font (Inter) -->
+    <!-- ✅ แก้ไข: เปลี่ยน Font เป็น Sarabun (400, 600, 700) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <!-- ✅✅✅ เปลี่ยน Library ตัวที่ 3: qrcode-generator ✅✅✅ -->
-    <!-- โหลดจาก CDN (cdnjs) -->
+    <!-- Library qrcode-generator -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
 
-    <!-- CSS (ดีไซน์เดิม) -->
+    <!-- CSS (ดีไซน์ที่ปรับปรุงใหม่) -->
     <style>
         :root {
-            --primary-color: #007bff;
-            --primary-hover: #0056b3;
-            --success-color: #28a745;
-            --success-hover: #218838;
+            /* ✅ แก้ไข: เปลี่ยนชุดสีปุ่ม */
+            --primary-color-start: #b8860b; /* DarkGoldenRod */
+            --primary-color-end: #daa520;   /* GoldenRod */
+            --success-color-start: #556b2f; /* DarkOliveGreen */
+            --success-color-end: #6b8e23;   /* OliveDrab */
+            
             --light-gray: #f8f9fa;
             --text-color: #333;
             --border-color: #e2e8f0;
             --status-ready-color: #28a745;
             --status-error-color: #dc3545;
+            
+            /* ✅ แก้ไข: สีพื้นหลังและสีหัวข้อใหม่ */
+            --background-color: #fdfaf5; /* สีครีมอ่อน / Off-white อมเหลือง */
+            --header-text-color: #5d4037; /* สีน้ำตาลเข้ม */
         }
 
         body {
-            font-family: 'Inter', 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+            /* ✅ แก้ไข: เปลี่ยน Font และ สีพื้นหลัง */
+            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--background-color);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -44,9 +50,10 @@
 
         .site-header {
             text-align: center;
-            color: #ffffff;
+            /* ✅ แก้ไข: เปลี่ยนสีตัวอักษรและเงา */
+            color: var(--header-text-color); 
             margin-bottom: 30px;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .site-header h1 {
@@ -70,6 +77,7 @@
             max-width: 500px;
         }
 
+        /* --- ส่วนของ Status (คงเดิม) --- */
         .system-status {
             position: absolute;
             top: 20px;
@@ -122,6 +130,7 @@
             background-color: white;
             animation: none;
         }
+        /* --- สิ้นสุดส่วน Status --- */
 
         .container {
             background-color: #ffffff;
@@ -157,7 +166,7 @@
             border-radius: 12px;
             margin-bottom: 25px;
             font-size: 1rem;
-            font-family: inherit;
+            font-family: inherit; /* ใช้ Font Sarabun */
             box-sizing: border-box;
             resize: vertical;
             transition: border-color 0.3s, box-shadow 0.3s;
@@ -165,8 +174,8 @@
 
         textarea:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(0,123,255,0.15);
+            border-color: var(--primary-color-start); /* เปลี่ยนสี focus เป็นสีทอง */
+            box-shadow: 0 0 0 4px rgba(184, 134, 11, 0.15); /* เงา focus สีทอง */
         }
 
         button {
@@ -175,7 +184,7 @@
             border-radius: 12px;
             font-size: 1.1rem;
             font-weight: 600;
-            font-family: inherit;
+            font-family: inherit; /* ใช้ Font Sarabun */
             cursor: pointer;
             width: 100%;
             color: white;
@@ -196,17 +205,20 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
 
+        /* ✅ แก้ไข: สีปุ่ม "สร้าง" (โทนสีทอง) */
         #generate-btn {
-            background: linear-gradient(90deg, #007bff 0%, #00bfff 100%);
+            background: linear-gradient(90deg, var(--primary-color-start) 0%, var(--primary-color-end) 100%);
             background-size: 200% 100%;
+            color: white; /* ตัวอักษรสีขาว */
         }
 
         #generate-btn:hover:not(:disabled) {
             background-position: right center;
         }
 
+        /* ✅ แก้ไข: สีปุ่ม "ดาวน์โหลด" (โทนสีเขียว) */
         #download-btn {
-            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            background: linear-gradient(90deg, var(--success-color-start) 0%, var(--success-color-end) 100%);
             background-size: 200% 100%;
             margin-top: 20px;
         }
@@ -220,13 +232,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* ทำให้มีขนาดพอดีกับ QR Code ที่จะสร้าง */
             min-height: 300px; 
             width: 100%;
         }
         
         #qrcode-container img {
-             /* ขนาดของ img จะถูกกำหนดโดย library */
             max-width: 100%;
             height: auto;
             border-radius: 8px;
@@ -252,8 +262,7 @@
     </header>
 
     <div class="container">
-        <h2>สร้าง QR Code ของคุณ</h2>
-        <p>ข้อมูลทั้งหมดประมวลผลในเบราว์เซอร์ของคุณ</p>
+        <p>ป้อน URL หรือข้อความที่นี่...</p>
         
         <textarea id="text-input" placeholder="ป้อน URL หรือข้อความที่นี่..."></textarea>
         
@@ -266,15 +275,13 @@
     </div>
 
     
-    <!-- ✅✅✅ สคริปต์หลัก (เขียนใหม่สำหรับ qrcode-generator) ✅✅✅ -->
+    <!-- สคริปต์หลัก (qrcode-generator) -->
     <script>
         window.onload = () => {
             // --- การตั้งค่า ---
-            // ✅ แก้ไข: ตั้งเป็น 0 เพื่อให้ Library คำนวณ Type Number (ขนาด) อัตโนมัติ
-            const qrCodeSize = 0; 
-            const errorCorrectionLevel = 'H'; // L, M, Q, H (ใช้ 'H' เผื่อใส่โลโก้ในอนาคต)
-            const cellSize = 8; // ขนาดแต่ละจุด QR Code (pixel) ลองปรับค่านี้ดู
-            // const logoURL = 'https://img2.pic.in.th/pic/-Ver.3-1.th.png'; // โลโก้ยังไม่รองรับในขั้นตอนนี้
+            const qrCodeSize = 0; // 0 = Auto-detect size
+            const errorCorrectionLevel = 'H'; // H = High (ดีที่สุดสำหรับการใส่โลโก้ในอนาคต)
+            const cellSize = 8; // ขนาดของจุด (pixel)
             
             const textInput = document.getElementById('text-input');
             const generateBtn = document.getElementById('generate-btn');
@@ -283,15 +290,13 @@
             const systemStatusDiv = document.getElementById('system-status');
             const statusTextSpan = document.getElementById('status-text');
 
-            // --- ตรวจสอบสถานะ Library (ตัวใหม่ qrcode) ---
+            // --- ตรวจสอบสถานะ Library (qrcode) ---
             if (typeof qrcode !== 'undefined') {
-                // ✅ ถ้าโหลดสำเร็จ
                 statusTextSpan.textContent = 'พร้อมใช้งาน';
                 systemStatusDiv.classList.add('ready');
                 generateBtn.disabled = false;
                 generateBtn.textContent = 'สร้าง QR Code';
             } else {
-                // ❌ ถ้าโหลดไม่สำเร็จ
                 statusTextSpan.textContent = 'ไม่พร้อมใช้งาน (Library โหลดไม่ได้)';
                 systemStatusDiv.classList.add('error');
                 generateBtn.disabled = true;
@@ -318,13 +323,12 @@
                 downloadBtn.style.display = 'none';
 
                 try {
-                    // --- สร้าง QR Code ด้วย Library ใหม่ ---
+                    // --- สร้าง QR Code ---
                     const qr = qrcode(qrCodeSize, errorCorrectionLevel);
                     qr.addData(text);
                     qr.make();
                     
-                    // สร้าง QR Code เป็น Data URL (base64) และแสดงผลใน <img>
-                    const imgTag = qr.createDataURL(cellSize); // cellSize คือขนาด pixel ของแต่ละ module
+                    const imgTag = qr.createDataURL(cellSize); 
                     
                     const imgElement = document.createElement('img');
                     imgElement.src = imgTag;
@@ -334,7 +338,6 @@
 
                 } catch (error) {
                     console.error("เกิดข้อผิดพลาดในการสร้าง QR Code:", error);
-                    // ✅ แก้ไข: แสดง error ที่ได้รับมาโดยตรง
                     alert('เกิดข้อผิดพลาดในการสร้าง QR Code: ' + error); 
                     systemStatusDiv.classList.add('error');
                     statusTextSpan.textContent = 'มีข้อผิดพลาด';
@@ -347,7 +350,7 @@
                 if (imgElement && imgElement.src) {
                     const a = document.createElement('a');
                     a.href = imgElement.src;
-                    a.download = 'qrcode.png'; // Library นี้สร้าง PNG เสมอ
+                    a.download = 'qrcode.png';
                     document.body.appendChild(a);
                     a.click(); 
                     document.body.removeChild(a); 
